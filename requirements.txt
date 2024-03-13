@@ -1,0 +1,12 @@
+httpx
+keyboard
+mitmproxy
+mss
+Pillow
+psutil
+PyGetWindow
+PyQt5
+pyscreenshot
+pywin32
+PyWinCtl
+Requests
