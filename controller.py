@@ -3,13 +3,16 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QRubberBand
 from PyQt5.QtCore import Qt, QRect, QPoint, QSize
 from PIL import ImageGrab
 import pywinctl as pwc
-import psutil
 import keyboard
 import win32gui
 import win32con
 import win32clipboard
 import sys
 from io import BytesIO
+import subprocess
+import time
+
+window_blacklist = ["", "Program Manager", "Microsoft Text Input Application", "LGControlCenterRTManager", "Media Player"]
 
 # Snipping Tool Class from the first script
 class SnippingTool(QMainWindow):
@@ -59,9 +62,6 @@ class SnippingTool(QMainWindow):
         self.close()
         x, y, w, h = rect.x(), rect.y(), rect.width(), rect.height()
         img = ImageGrab.grab(bbox=(x, y, x+w, y+h))
-        from mss import mss
-        with mss() as sct:
-            sct.shot(output="monitor-1.png")
         # save to clipboard
         self.send_to_clipboard(img)
 
@@ -94,10 +94,7 @@ def get_all_app_windows():
     windows = pwc.getAllWindows()
     windows = [window for window in windows if hasattr(window, "title")
                and window._parent == 0
-               and window.title != ""
-               and window.title != "Program Manager"
-               and window.title != "Microsoft Text Input Application"
-               and window.title != "LGControlCenterRTManager"]
+               and window.title not in window_blacklist]
     return windows
 
 def cycle_windows_and_set_top():
@@ -147,7 +144,7 @@ def minimize_all_windows(event=None):
 
 
 def unminimize_all_windows(event=None):
-    cycle_windows_and_set_top()
+    time.sleep(0.1)  # Wait for the function to hook
     cycle_windows_and_set_top()
     
 def cleanup_and_exit(event=None):
@@ -160,14 +157,15 @@ def cleanup_and_exit(event=None):
 
 def close_respondus(event=None):
     # Close LockDownBrowser.exe
-    # while LockDownBrowser.exe is running, kill it
-    while "LockDownBrowser.exe" in (proc.info['name'] for proc in psutil.process_iter(['name'])):
-        for proc in psutil.process_iter(['name']):
-            if proc.info['name'] == "LockDownBrowser.exe":
-                proc.kill()
-                print("LockDownBrowser.exe killed")
-                show_taskbar()
-                break
+    process_name = "LockDownBrowser.exe"
+    try:
+        # Forcefully terminate the process by its name
+        subprocess.run(["taskkill", "/f", "/im", process_name], check=True)
+        print(f"The process {process_name} has been successfully terminated.")
+    except subprocess.CalledProcessError as e:
+        # This block is executed if the process is not found or taskkill encounters an error
+        print(f"Failed to terminate {process_name}. Error: {e}")
+
 
 def show_taskbar(event=None):
     # Show the taskbar

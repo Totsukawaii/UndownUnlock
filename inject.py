@@ -18,7 +18,6 @@ if not os.path.exists(path_dll):
 # Target process name
 target_process_name = "LockDownBrowser.exe"
 
-print(os.getcwd())
 print(f"Waiting for {target_process_name} to start...")
 # Loop to wait for the process to start
 while True:

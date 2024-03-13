@@ -11,9 +11,8 @@ call activate.bat lockdown
 
 if %errorlevel% == 1 (
   echo Environment 'lockdown' not found. Creating...
-  conda init
   conda create -n lockdown python=3.10 -y
-  call conda activate lockdown
+  call activate.bat lockdown
   call pip install -r requirements.txt
 )
 

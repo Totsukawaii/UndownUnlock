@@ -3,7 +3,7 @@ Respondus LockDown Browser cheats
 
 ## Features
 
- - :white_check_mark: Alt tab with `ctrl + left` or `ctrl + right` 
+ - :white_check_mark: Alt tab with `ctrl + left` and `ctrl + right`, focus and unfocus with `ctrl + down` and `ctrl + up`
  - :white_check_mark: Screenshots `ctrl + shift + s`
  - :white_check_mark: Kill Respondus button `delete`
 
@@ -22,44 +22,44 @@ Respondus LockDown Browser cheats
 
 1. Download the zip file from releases (contains the dll file)
 
-2. Run `install_miniconda.bat`
+2. Double click `install_miniconda.bat`, make sure the file path doesn't have spaces or brackets
 
-3. Run both batch files `run_controller.bat` and `run_injector.bat` in Administrator mode
+3. Right click and run `run_controller.bat` and `run_injector.bat` in Administrator mode
 
 5. Launch Respondus.
 
 6. :warning: If dll has successfully been injected a messagebox saying 'Injected' will appear. If dll has not been injected alt-tab will be detected and LockDownBrowser will close.
 
-7. Use `ctrl+left` and `ctrl+right` to alt-tab, use `ctrl+up` to unfocus lockdown browser, use `ctrl+down` to focus lockdown browser to type (or when the teacher is coming)
+7. Use `ctrl+left` and `ctrl+right` to alt-tab, use `ctrl+up` to show other windows, use `ctrl+down` to focus lockdown browser to type (or when the teacher is coming)
 
-## Q&A
+## General Issues
 
-Q: Is this detected? Will I be banned?
-A: Use at your own risk.
+- **Is this detected? Will I be banned?**
+  - *Use at your own risk.*
 
-Q: Why can't I type in LockDown Browser?
-A: Press the down arrow, and click out of a answer box and click back in.
+- **Why can't I type in LockDown Browser?**
+  - *Press the down arrow, and click out of an answer box and click back in.*
 
-Q: Why does the drop down box not work?
-A: Drop down boxes don't work during the test because of the focus hooks, but you can use the up and down arrows to choose the options of the drop down boxes.
+- **Why does the drop down box not work?**
+  - *Drop down boxes don't work during the test because of the focus hooks. Use the up and down arrows to choose options.*
 
-Q: Why is the screen white?
-A: Press the down arrow to focus back on LockDown Browser.
+- **Why is the screen white?**
+  - *Press the down arrow to focus back on LockDown Browser.*
 
-Q: I'm stuck, how do I close the LockDown Browser?
-A: If then controller is running press the delete key.
+- **I'm stuck, how do I close the LockDown Browser?**
+  - *If the controller is running, press the delete key.*
+  
+- **My taskbar disappeared. How do I make it come back?**
+  - *If the controller is running, press F10. Otherwise, open LockDown Browser and manually close it again.*
 
-Q: My taskbar disappeared. How do I make it come back?
-A: If the controller is running press f10, else open LockDown Browser and manually close it again.
+- **Why do I get a warning of swiping tabs during the exam?**
+  - *The DLL was not injected.*
 
-Q: Why do I get the warning of swiping tabs during the exam?
-A: The dll was not injected.
+- **Why is LockDown Browser still asking me to close my application?**
+  - *Just click the 'close' button; the application will not actually close.*
 
-Q: Why is LockDown Browser still asking me to close my application?
-A: Just click the 'close' button, the application will not actually close.
-
-Q: Is the dll malware?
-A: Yes.
+- **Is the DLL malware?**
+  - *Yes.*
 
 ## TODO
 
