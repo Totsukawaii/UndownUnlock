@@ -24,23 +24,6 @@ echo Downloading Miniconda...
 echo Installing Miniconda to %InstallDir%...
 start /wait "" %MinicondaInstaller% /InstallationType=JustMe /RegisterPython=0 /S /D=%InstallDir%
 
-:: Set up Miniconda path temporarily for the current script
-SET PATH=%InstallDir%;%InstallDir%\Scripts;%InstallDir%\Library\bin;%PATH%
-
-:: Create new virtual environment with Python 3.10
-echo Creating a new virtual environment with Python 3.10...
-conda create -n lockdown python=3.10 -y
-call "%InstallDir%\Scripts\activate.bat" lockdown
-pip install -r requirements.txt
-
-:: Create a new virtual environment with Python 3.7
-echo Creating a new virtual environment with Python 3.7...
-Set CONDA_FORCE_32BIT=1
-conda create -n lockdown32 python=3.7 -y
-call "%InstallDir%\Scripts\activate.bat" lockdown32
-pip install -r requirements32.txt
-
-
 echo Setup complete.
 
 pause
