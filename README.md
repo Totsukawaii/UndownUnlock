@@ -24,13 +24,15 @@ Respondus LockDown Browser cheats
 
 2. Double click `install_miniconda.bat`, make sure the file path doesn't have spaces or brackets
 
-3. Right click and run `run_controller.bat` and `run_injector.bat` in Administrator mode
+3. Right click and run `run_controller.bat` and `run_injector.bat` in Administrator mode and wait for the installations to complete if it's your first time running.
 
-5. Launch Respondus.
+4. Launch Respondus.
 
-6. :warning: If dll has successfully been injected a messagebox saying 'Injected' will appear. If dll has not been injected alt-tab will be detected and LockDownBrowser will close.
+5. :warning: If dll has successfully been injected a messagebox saying 'Injected' will appear. If dll has not been injected alt-tab will be detected and LockDownBrowser will close.
 
-7. Use `ctrl+left` and `ctrl+right` to alt-tab, use `ctrl+up` to show other windows, use `ctrl+down` to focus lockdown browser to type (or when the teacher is coming)
+6. Use `ctrl+left` and `ctrl+right` to alt-tab, use `ctrl+up` to show other windows, use `ctrl+down` to focus lockdown browser to type (or when the teacher is coming)
+
+7. Once you exit LockDownBrowser, use `esc` to restore windows.
 
 ## General Issues
 
@@ -45,6 +47,9 @@ Respondus LockDown Browser cheats
 
 - **Why is the screen white?**
   - *Press the down arrow to focus back on LockDown Browser.*
+
+- **Why can't I screenshot in LockDownBrowser**
+  - *You can't screenshot in LockDownBrowser, because of DRM protection any screenshot appear black.*
 
 - **I'm stuck, how do I close the LockDown Browser?**
   - *If the controller is running, press the delete key.*
