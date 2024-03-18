@@ -7,6 +7,13 @@ __pycache__/
 
 response/
 
+# images
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+
 
 # Ignore all python files except 
 *.py

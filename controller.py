@@ -11,6 +11,7 @@ import sys
 from io import BytesIO
 import subprocess
 import time
+import psutil
 
 window_blacklist = ["", "Program Manager", "Microsoft Text Input Application", "LGControlCenterRTManager", "Media Player"]
 
@@ -156,15 +157,19 @@ def cleanup_and_exit(event=None):
     sys.exit()  # Use sys.exit() to exit the program
 
 def close_respondus(event=None):
-    # Close LockDownBrowser.exe
-    process_name = "LockDownBrowser.exe"
-    try:
-        # Forcefully terminate the process by its name
-        subprocess.run(["taskkill", "/f", "/im", process_name], check=True)
-        print(f"The process {process_name} has been successfully terminated.")
-    except subprocess.CalledProcessError as e:
-        # This block is executed if the process is not found or taskkill encounters an error
-        print(f"Failed to terminate {process_name}. Error: {e}")
+    # Close LockDownBrowser
+    target_substring = "LockDownBrowser"
+    for proc in psutil.process_iter(['name']):
+        proc_name = proc.name()
+        if target_substring in proc_name:
+            pid = proc.pid
+            print(f"Found {proc_name} with PID: {pid}")
+            try:
+                # Once the process is found: end the process
+                proc.kill()
+            except Exception as e:
+                print(e)
+                print("Failed to close " + proc_name)
 
 
 def show_taskbar(event=None):

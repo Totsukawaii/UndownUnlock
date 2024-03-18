@@ -15,17 +15,18 @@ if not os.path.exists(path_dll):
         raise FileNotFoundError("DLLHooks.dll not found. Either place the DLL in the same directory as this script or in the DLLHooks/Release directory.")
 
 
-# Target process name
-target_process_name = "LockDownBrowser.exe"
+# Substring to look for in process names
+target_substring = "LockDownBrowser"
 
-print(f"Waiting for {target_process_name} to start...")
+print("Waiting for a LockDown Browser process to start...")
 # Loop to wait for the process to start
 while True:
     break_flag = False
     for proc in psutil.process_iter(['name']):
-        if proc.name() == target_process_name:
+        proc_name = proc.name()
+        if target_substring in proc_name:
             pid = proc.pid
-            print(f"Found exe with PID: {pid}")
+            print(f"Found {proc_name} with PID: {pid}")
             try:
                 # Once the process is found:
                 injector.load_from_pid(pid)
