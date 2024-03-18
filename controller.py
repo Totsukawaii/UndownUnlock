@@ -182,6 +182,12 @@ def show_snipping_tool(event=None):
     snipping_tool = SnippingTool()
     app.exec_()
 
+def open_browser(event=None):
+    chrome_path = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
+    url = "https://google.com"
+    process = subprocess.Popen([chrome_path, url], creationflags=subprocess.CREATE_NEW_CONSOLE)
+
+
 current_overlay_index = 0 
 
 # Modify keyboard listener setup to include Ctrl + Shift + S for the Snipping Tool
@@ -192,6 +198,7 @@ keyboard.add_hotkey("ctrl+left", cycle_left)
 keyboard.add_hotkey("ctrl+down", minimize_all_windows)
 keyboard.add_hotkey("ctrl+up", unminimize_all_windows)
 keyboard.on_press_key("esc", cleanup_and_exit)
+keyboard.on_press_key("ins", open_browser)
 # key del to close respondus
 keyboard.on_press_key("delete", close_respondus)
 keyboard.on_press_key("f8", hide_taskbar)
