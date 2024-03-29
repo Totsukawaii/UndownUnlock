@@ -1,5 +1,5 @@
 # UndownUnlock
-Respondus LockDown Browser cheats
+Respondus LockDown Browser cheats/hacks
 
 ## Features
 
