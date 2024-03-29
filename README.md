@@ -1,5 +1,5 @@
 # UndownUnlock
-Respondus LockDown Browser cheats/hacks (No VM required)
+Respondus LockDown Browser cheats hacks (No VM required)
 
 ## Features
 
