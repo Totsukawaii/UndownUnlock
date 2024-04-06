@@ -30,7 +30,7 @@ Respondus LockDown Browser cheats hacks (No VM required)
 
 5. :warning: If dll has successfully been injected a messagebox saying 'Injected' will appear. If dll has not been injected alt-tab will be detected and LockDownBrowser will close.
 
-6. Use `ctrl+left` and `ctrl+right` to alt-tab, use `ctrl+up` to show other windows, use `ctrl+down` to focus lockdown browser to type (or when the teacher is coming)
+6. use `ctrl+up` to show other windows, followed by `ctrl+left` and `ctrl+right` to alt-tab, use `ctrl+down` to focus back on lockdown browser to type (or when the teacher is coming)
 
 7. Once you exit LockDownBrowser, use `esc` to restore windows.
 

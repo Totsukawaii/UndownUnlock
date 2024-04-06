@@ -9,11 +9,10 @@ import win32con
 import win32clipboard
 import sys
 from io import BytesIO
-import subprocess
 import time
 import psutil
 
-window_blacklist = ["", "Program Manager", "Microsoft Text Input Application", "LGControlCenterRTManager", "Media Player"]
+window_blacklist = ["", "Program Manager", "Microsoft Text Input Application", "LGControlCenterRTManager", "Media Player", "Setup"]
 
 # Snipping Tool Class from the first script
 class SnippingTool(QMainWindow):
@@ -99,93 +98,117 @@ def get_all_app_windows():
     return windows
 
 def cycle_windows_and_set_top():
-    global current_overlay_index
-    windows = get_all_app_windows()
-
-    if len(windows) == 0:
-        print("No valid windows found.")
-        return
-
-    windows.sort(key=lambda x: x._hWnd)
-    
-    next_window_index = current_overlay_index % len(windows)
-    next_window = windows[next_window_index]
-
     try:
-        next_window.activate()
-    except Exception as e:
-        if e.__class__.__name__ == 'PyGetWindowException':
-             pass
-        else:
-             raise e
+        global current_overlay_index
+        windows = get_all_app_windows()
 
-    hwnd = next_window._hWnd
-    print("Switching to", next_window.title)
-    set_window_on_top(hwnd)
+        if len(windows) == 0:
+            print("No valid windows found.")
+            return
+
+        windows.sort(key=lambda x: x._hWnd)
+        
+        next_window_index = current_overlay_index % len(windows)
+        next_window = windows[next_window_index]
+
+        try:
+            next_window.activate()
+        except Exception as e:
+            if e.__class__.__name__ == 'PyGetWindowException':
+                pass
+            else:
+                raise e
+
+        hwnd = next_window._hWnd
+        print("Switching to", next_window.title)
+        set_window_on_top(hwnd)
+    except Exception as e:
+        print(e)
 
 
 def minimize_all_windows(event=None):
-    global window_positions  # Access the global dictionary
-    windows = get_all_app_windows()
-    for window in windows:
-        if "Respondus LockDown Browser" != window.title:
-            hwnd = window._hWnd
-            is_maximized = window.isMaximized  # Check if the window is maximized
-            # Save the window's current position, size, and maximized state before minimizing
-            rect = win32gui.GetWindowRect(hwnd)
-            window_positions[hwnd] = (rect, is_maximized)  # Store position, size, and state
-            window.minimize()
-    # focus on LockDownBrowser
-    for window in windows:
-        if "Respondus LockDown Browser" == window.title:
-            window.activate()
-            hwnd = window._hWnd
-            set_window_on_top(hwnd)
-    print("Minimizing all windows...")
+    try:
+        global window_positions  # Access the global dictionary
+        windows = get_all_app_windows()
+        for window in windows:
+            if "Respondus LockDown Browser" != window.title:
+                hwnd = window._hWnd
+                is_maximized = window.isMaximized  # Check if the window is maximized
+                # Save the window's current position, size, and maximized state before minimizing
+                rect = win32gui.GetWindowRect(hwnd)
+                window_positions[hwnd] = (rect, is_maximized)  # Store position, size, and state
+                window.minimize()
+        # focus on LockDownBrowser
+        for window in windows:
+            if "Respondus LockDown Browser" == window.title:
+                window.activate()
+                hwnd = window._hWnd
+                set_window_on_top(hwnd)
+        print("Minimizing all windows...")
+    except Exception as e:
+        print(e)
 
 
 def unminimize_all_windows(event=None):
-    time.sleep(0.1)  # Wait for the function to hook
-    cycle_windows_and_set_top()
+    try:
+        time.sleep(0.1)  # Wait for the function to hook
+        cycle_windows_and_set_top()
+    except Exception as e:
+        print(e)
     
 def cleanup_and_exit(event=None):
-    windows = get_all_app_windows()
-    hwnds = [window._hWnd for window in windows]
-    for hwnd in hwnds:
-            set_window_not_on_top(hwnd)
-    print("Exiting...")
-    sys.exit()  # Use sys.exit() to exit the program
+    try:
+        windows = get_all_app_windows()
+        hwnds = [window._hWnd for window in windows]
+        for hwnd in hwnds:
+                set_window_not_on_top(hwnd)
+        print("Exiting...")
+        sys.exit()  # Use sys.exit() to exit the program
+    except Exception as e:
+        print(e)
 
 def close_respondus(event=None):
-    # Close LockDownBrowser
-    target_substring = "LockDownBrowser"
-    for proc in psutil.process_iter(['name']):
-        proc_name = proc.name()
-        if target_substring in proc_name:
-            pid = proc.pid
-            print(f"Found {proc_name} with PID: {pid}")
-            try:
-                # Once the process is found: end the process
-                proc.kill()
-            except Exception as e:
-                print(e)
-                print("Failed to close " + proc_name)
+    try:
+        # Close LockDownBrowser
+        target_substring = "LockDownBrowser"
+        for proc in psutil.process_iter(['name']):
+            proc_name = proc.name()
+            if target_substring in proc_name:
+                pid = proc.pid
+                print(f"Found {proc_name} with PID: {pid}")
+                try:
+                    # Once the process is found: end the process
+                    proc.kill()
+                except Exception as e:
+                    print(e)
+                    print("Failed to close " + proc_name)
+    except Exception as e:
+        print(e)
 
 
 def show_taskbar(event=None):
-    # Show the taskbar
-    hwnd = win32gui.FindWindow("Shell_traywnd", None)
-    win32gui.ShowWindow(hwnd, win32con.SW_SHOW)
+    try:
+        # Show the taskbar
+        hwnd = win32gui.FindWindow("Shell_traywnd", None)
+        win32gui.ShowWindow(hwnd, win32con.SW_SHOW)
+    except Exception as e:
+        print(e)
 
 def hide_taskbar(event=None):
-    # Hide the taskbar
-    hwnd = win32gui.FindWindow("Shell_traywnd", None)
-    win32gui.ShowWindow(hwnd, win32con.SW_HIDE)
+    try:
+        # Hide the taskbar
+        hwnd = win32gui.FindWindow("Shell_traywnd", None)
+        win32gui.ShowWindow(hwnd, win32con.SW_HIDE)
+    except Exception as e:
+        print(e)
 
 def show_snipping_tool(event=None):
-    app = QApplication(sys.argv)  # Ensure this only runs once
-    snipping_tool = SnippingTool()
-    app.exec_()
+    try:
+        app = QApplication(sys.argv)  # Ensure this only runs once
+        snipping_tool = SnippingTool()
+        app.exec_()
+    except Exception as e:
+        print(e)
 
 current_overlay_index = 0 
 
