@@ -32,7 +32,7 @@ Respondus LockDown Browser cheats hacks (No VM required)
 
 6. use `ctrl+up` to show other windows, followed by `ctrl+left` and `ctrl+right` to alt-tab, use `ctrl+down` to focus back on lockdown browser to type (or when the teacher is coming)
 
-7. Once you exit LockDownBrowser, use `esc` to restore windows.
+7. Once you exit LockDownBrowser, use `esc` to restore windows. If you press `esc` while in the exam you will no longer be able to alt tab.
 
 ## General Issues
 
