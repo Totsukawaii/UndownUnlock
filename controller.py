@@ -7,12 +7,13 @@ import keyboard
 import win32gui
 import win32con
 import win32clipboard
+import win32process
 import sys
 from io import BytesIO
 import time
 import psutil
 
-window_blacklist = ["", "Program Manager", "Microsoft Text Input Application", "LGControlCenterRTManager", "Media Player", "Setup"]
+window_blacklist = ["", "Program Manager", "Microsoft Text Input Application", "LGControlCenterRTManager", "Media Player"]
 
 # Snipping Tool Class from the first script
 class SnippingTool(QMainWindow):
@@ -97,6 +98,14 @@ def get_all_app_windows():
                and window.title not in window_blacklist]
     return windows
 
+def is_exe_window(hwnd):
+    try:
+        _, pid = win32process.GetWindowThreadProcessId(hwnd)
+        process = psutil.Process(pid)
+        return process.exe().endswith('.exe')
+    except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+        return False
+
 def cycle_windows_and_set_top():
     try:
         global current_overlay_index
@@ -111,17 +120,21 @@ def cycle_windows_and_set_top():
         next_window_index = current_overlay_index % len(windows)
         next_window = windows[next_window_index]
 
-        try:
-            next_window.activate()
-        except Exception as e:
-            if e.__class__.__name__ == 'PyGetWindowException':
-                pass
-            else:
-                raise e
-
         hwnd = next_window._hWnd
-        print("Switching to", next_window.title)
-        set_window_on_top(hwnd)
+        if is_exe_window(hwnd):
+            try:
+                next_window.activate()
+            except Exception as e:
+                if e.__class__.__name__ == 'PyGetWindowException':
+                    pass
+                else:
+                    raise e
+
+            print("Switching to", next_window.title)
+            set_window_on_top(hwnd)
+        else:
+            current_overlay_index += 1
+            cycle_windows_and_set_top()
     except Exception as e:
         print(e)
 
