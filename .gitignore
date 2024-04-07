@@ -26,6 +26,7 @@ response/
 !install_miniconda.bat
 !run_controller.bat
 !run_injector.bat
+!launch.bat
 
 # Ignore dll
 *.dll

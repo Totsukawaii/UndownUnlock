@@ -3,9 +3,9 @@ Respondus LockDown Browser cheats hacks (No VM required)
 
 ## Features
 
- - :white_check_mark: Alt tab with `ctrl + left` and `ctrl + right`, focus and unfocus with `ctrl + down` and `ctrl + up`
- - :white_check_mark: Screenshots `ctrl + shift + s`
- - :white_check_mark: Kill Respondus button `delete`
+ - :white_check_mark: Alt-tab with `ctrl + down` and `ctrl + up`
+ - :white_check_mark: Screenshots `ctrl + shift + s` (Cannot screenshot LDB yet)
+ - :white_check_mark: Kill Respondus button `ctrl+shfit+delete`
 
 ## DLL Bypasses
 
@@ -20,21 +20,24 @@ Respondus LockDown Browser cheats hacks (No VM required)
 
 ## How to use
 
-1. Download the zip file from the Releases [here](https://github.com/Totsukawaii/UndownUnlock/releases/download/v1.0.3/UndownUnlock-v1.0.3.zip) (contains the dll file)
+1. Download the zip file from the Releases [here](https://github.com/Totsukawaii/UndownUnlock/releases/download/v1.1.0/UndownUnlock-v1.1.0.zip) (contains the dll file)
 
-2. Double click `install_miniconda.bat` and wait for the installation to complete, make sure the file path doesn't have spaces or brackets
+2. Make sure the file path doesn't have spaces or brackets.
 
-3. Right click and run `run_controller.bat` and `run_injector.bat` in Administrator mode and wait for the installations to complete if it's your first time running.
+3. Right click and run `launch.bat` in Administrator mode. Wait for the message `Waiting for a LockDown Browser process to start...`
 
 4. Launch Respondus.
 
-5. :warning: If dll has successfully been injected a messagebox saying 'Injected' will appear. If dll has not been injected alt-tab will be detected and LockDownBrowser will close.
+5. :warning: If dll has successfully a messagebox will appear. If messagebox does not appear the dll was not injected successfully and alt-tabing will be detected by LockDown Browser.
+<img src="https://github.com/Totsukawaii/UndownUnlock/assets/45559904/1dce3fc9-0001-4877-b799-f6245d9c9b9d" width="87" height="105">
 
-6. use `ctrl+up` to show other windows, followed by `ctrl+left` and `ctrl+right` to alt-tab, use `ctrl+down` to focus back on lockdown browser to type (or when the teacher is coming)
+6. Use `ctrl+up` to show other windows and `ctrl+down` to focus back on lockdown browser to type (or when the teacher is coming)
 
-7. Once you exit LockDownBrowser, use `esc` to restore windows. If you press `esc` while in the exam you will no longer be able to alt tab.
+7. Once you exit LockDownBrowser, use `esc` to restore windows and exit. If you press `esc` while in the exam you will no longer be able to alt tab.
 
 ## General Issues
+
+If you have issues with this version of UndownUnlock try going back to the previous version [here](https://github.com/Totsukawaii/UndownUnlock/tree/becf9350537ce7a04ab29ba77b67d33e9558b392)
 
 - **Is this detected? Will I be banned?**
   - *Use at your own risk.*

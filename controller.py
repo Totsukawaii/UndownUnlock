@@ -81,15 +81,15 @@ def set_window_not_on_top(hwnd):
     win32gui.SetWindowPos(hwnd, win32con.HWND_NOTOPMOST, 0, 0, 0, 0,
                           win32con.SWP_NOMOVE | win32con.SWP_NOSIZE | win32con.SWP_SHOWWINDOW)
 
-def cycle_right(event = None):
-    global current_overlay_index
-    current_overlay_index += 1
-    cycle_windows_and_set_top()
+# def cycle_right(event = None):
+#     global current_overlay_index
+#     current_overlay_index += 1
+#     cycle_windows_and_set_top()
 
-def cycle_left(event = None):
-    global current_overlay_index
-    current_overlay_index -= 1
-    cycle_windows_and_set_top()
+# def cycle_left(event = None):
+#     global current_overlay_index
+#     current_overlay_index -= 1
+#     cycle_windows_and_set_top()
 
 def get_all_app_windows():
     windows = pwc.getAllWindows()
@@ -106,51 +106,53 @@ def is_exe_window(hwnd):
     except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
         return False
 
-def cycle_windows_and_set_top():
-    try:
-        global current_overlay_index
-        windows = get_all_app_windows()
+# def cycle_windows_and_set_top():
+#     try:
+#         global current_overlay_index
+#         windows = get_all_app_windows()
 
-        if len(windows) == 0:
-            print("No valid windows found.")
-            return
+#         if len(windows) == 0:
+#             print("No valid windows found.")
+#             return
 
-        windows.sort(key=lambda x: x._hWnd)
+#         windows.sort(key=lambda x: x._hWnd)
         
-        next_window_index = current_overlay_index % len(windows)
-        next_window = windows[next_window_index]
+#         next_window_index = current_overlay_index % len(windows)
+#         next_window = windows[next_window_index]
 
-        hwnd = next_window._hWnd
-        if is_exe_window(hwnd):
-            try:
-                next_window.activate()
-            except Exception as e:
-                if e.__class__.__name__ == 'PyGetWindowException':
-                    pass
-                else:
-                    raise e
+#         hwnd = next_window._hWnd
+#         if is_exe_window(hwnd):
+#             try:
+#                 next_window.activate()
+#             except Exception as e:
+#                 if e.__class__.__name__ == 'PyGetWindowException':
+#                     pass
+#                 else:
+#                     raise e
 
-            print("Switching to", next_window.title)
-            set_window_on_top(hwnd)
-        else:
-            current_overlay_index += 1
-            cycle_windows_and_set_top()
-    except Exception as e:
-        print(e)
+#             print("Switching to", next_window.title)
+#             # set_window_on_top(hwnd)
+#         else:
+#             current_overlay_index += 1
+#             cycle_windows_and_set_top()
+#     except Exception as e:
+#         print(e)
 
 
 def minimize_all_windows(event=None):
     try:
+        unminimize_lockdown_browser()
+        hide_taskbar()
         global window_positions  # Access the global dictionary
         windows = get_all_app_windows()
-        for window in windows:
-            if "Respondus LockDown Browser" != window.title:
-                hwnd = window._hWnd
-                is_maximized = window.isMaximized  # Check if the window is maximized
-                # Save the window's current position, size, and maximized state before minimizing
-                rect = win32gui.GetWindowRect(hwnd)
-                window_positions[hwnd] = (rect, is_maximized)  # Store position, size, and state
-                window.minimize()
+        # for window in windows:
+        #     if "Respondus LockDown Browser" != window.title:
+        #         hwnd = window._hWnd
+        #         is_maximized = window.isMaximized  # Check if the window is maximized
+        #         # Save the window's current position, size, and maximized state before minimizing
+        #         rect = win32gui.GetWindowRect(hwnd)
+        #         window_positions[hwnd] = (rect, is_maximized)  # Store position, size, and state
+        #         window.minimize()
         # focus on LockDownBrowser
         for window in windows:
             if "Respondus LockDown Browser" == window.title:
@@ -164,8 +166,41 @@ def minimize_all_windows(event=None):
 
 def unminimize_all_windows(event=None):
     try:
-        time.sleep(0.1)  # Wait for the function to hook
-        cycle_windows_and_set_top()
+        # time.sleep(0.1)  # Wait for the function to hook
+        minimize_lockdown_browser()
+        # cycle_windows_and_set_top()
+        show_taskbar()
+    except Exception as e:
+        print(e)
+
+def minimize_lockdown_browser(event=None):
+    try:
+        windows = get_all_app_windows()
+        for window in windows:
+            if "Respondus LockDown Browser" == window.title:
+                hwnd = window._hWnd
+                is_maximized = window.isMaximized  # Check if the window is maximized
+                # Save the window's current position, size, and maximized state before minimizing
+                rect = win32gui.GetWindowRect(hwnd)
+                window_positions[hwnd] = (rect, is_maximized)  # Store position, size, and state
+                window.minimize()
+                print("Minimizing LockDownBrowser...")
+    except Exception as e:
+        print(e)
+
+def unminimize_lockdown_browser(event=None):
+    try:
+        windows = get_all_app_windows()
+        for window in windows:
+            if "Respondus LockDown Browser" == window.title:
+                hwnd = window._hWnd
+                rect, is_maximized = window_positions[hwnd]  # Retrieve position, size, and state
+                # Restore the window to its previous position, size, and state
+                win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, rect[0], rect[1], rect[2], rect[3],
+                                      win32con.SWP_SHOWWINDOW)
+                if is_maximized:
+                    win32gui.ShowWindow(hwnd, win32con.SW_MAXIMIZE)
+                print("Unminimizing LockDownBrowser...")
     except Exception as e:
         print(e)
     
@@ -201,9 +236,18 @@ def close_respondus(event=None):
 
 def show_taskbar(event=None):
     try:
-        # Show the taskbar
-        hwnd = win32gui.FindWindow("Shell_traywnd", None)
-        win32gui.ShowWindow(hwnd, win32con.SW_SHOW)
+
+        # Find the handle to the taskbar
+        hwnd = win32gui.FindWindow("Shell_TrayWnd", None)
+        if hwnd:
+            # Temporarily set the taskbar as the topmost window
+            win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 0, 0, 0, 0,
+                                  win32con.SWP_NOMOVE | win32con.SWP_NOSIZE | win32con.SWP_SHOWWINDOW)
+            # Then immediately revert it back to a normal state (not topmost)
+            win32gui.SetWindowPos(hwnd, win32con.HWND_NOTOPMOST, 0, 0, 0, 0,
+                                  win32con.SWP_NOMOVE | win32con.SWP_NOSIZE | win32con.SWP_SHOWWINDOW)
+            # Finally, show the taskbar
+            win32gui.ShowWindow(hwnd, win32con.SW_SHOW)
     except Exception as e:
         print(e)
 
@@ -228,8 +272,8 @@ current_overlay_index = 0
 # Modify keyboard listener setup to include Ctrl + Shift + S for the Snipping Tool
 keyboard.add_hotkey("ctrl+shift+s", show_snipping_tool)
 # Keyboard listener
-keyboard.add_hotkey("ctrl+right", cycle_right)
-keyboard.add_hotkey("ctrl+left", cycle_left)
+# keyboard.add_hotkey("ctrl+right", cycle_right)
+# keyboard.add_hotkey("ctrl+left", cycle_left)
 keyboard.add_hotkey("ctrl+down", minimize_all_windows)
 keyboard.add_hotkey("ctrl+up", unminimize_all_windows)
 keyboard.on_press_key("esc", cleanup_and_exit)
