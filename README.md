@@ -22,7 +22,7 @@ Respondus LockDown Browser cheats hacks (No VM required)
 
 1. Download the zip file from the Releases [here](https://github.com/Totsukawaii/UndownUnlock/releases/download/v1.0.3/UndownUnlock-v1.0.3.zip) (contains the dll file)
 
-2. Double click `install_miniconda.bat`, make sure the file path doesn't have spaces or brackets
+2. Double click `install_miniconda.bat` and wait for the installation to complete, make sure the file path doesn't have spaces or brackets
 
 3. Right click and run `run_controller.bat` and `run_injector.bat` in Administrator mode and wait for the installations to complete if it's your first time running.
 
