@@ -24,7 +24,7 @@ Help me test my [dev branch](https://github.com/Totsukawaii/UndownUnlock/tree/de
 
 ## How to use
 
-1. Download the zip file from the Releases [here](https://github.com/Totsukawaii/UndownUnlock/releases/download/v1.0.3/UndownUnlock-v1.0.3.zip) (contains the dll file)
+1. Download the zip file from the Releases [here](https://github.com/Totsukawaii/UndownUnlock/releases/download/v1.0.2/UndownUnlock-v1.0.2.zip) (contains the dll file)
 
 2. Double click `install_miniconda.bat` and wait for the installation to complete, make sure the file path doesn't have spaces or brackets
 
