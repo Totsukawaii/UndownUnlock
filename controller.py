@@ -104,6 +104,7 @@ def is_exe_window(hwnd):
         process = psutil.Process(pid)
         return process.exe().endswith('.exe')
     except Exception as e:
+        print(e)
         return False
 
 def cycle_windows_and_set_top():
@@ -125,10 +126,8 @@ def cycle_windows_and_set_top():
             try:
                 next_window.activate()
             except Exception as e:
-                if e.__class__.__name__ == 'PyGetWindowException':
-                    pass
-                else:
-                    raise e
+                print(e)
+                cycle_windows_and_set_top()
 
             print("Switching to", next_window.title)
             set_window_on_top(hwnd)
