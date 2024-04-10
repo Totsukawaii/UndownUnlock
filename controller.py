@@ -103,7 +103,7 @@ def is_exe_window(hwnd):
         _, pid = win32process.GetWindowThreadProcessId(hwnd)
         process = psutil.Process(pid)
         return process.exe().endswith('.exe')
-    except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+    except Exception as e:
         return False
 
 def cycle_windows_and_set_top():

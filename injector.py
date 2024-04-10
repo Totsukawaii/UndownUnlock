@@ -21,7 +21,7 @@ class Injector:
     def load_from_pid(self, pid):
         self.unload()
         self.pid = c_ulong(pid)
-        self.handle = self.kernel32.OpenProcess(self.PROC_ALL_ACCESS, 0, pid)
+        self.handle = self.kernel32.OpenProcess(self.PROC_ALL_ACCESS, 0, pid, stdin=subprocess.DEVNULL)
         if not self.handle:
             raise WinError()
 
