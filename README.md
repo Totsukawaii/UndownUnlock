@@ -26,7 +26,7 @@ Help me test my [dev branch](https://github.com/Totsukawaii/UndownUnlock/tree/de
 
 1. Download the zip file from the Releases [here](https://github.com/Totsukawaii/UndownUnlock/releases/download/v1.0.5/UndownUnlock-v1.0.5.zip) (contains the dll file)
 
-2. Double click `install_miniconda.bat` and wait for the installation to complete, make sure the file path doesn't have spaces or brackets
+2. Double click `install_miniconda.bat` and wait for the installation to complete (wait for the message `Press any key to continue...`), make sure the file path doesn't have spaces or brackets
 
 3. Right click and run `run_controller.bat` and `run_injector.bat` in Administrator mode and wait for the installations to complete if it's your first time running.
 
