@@ -18,6 +18,19 @@ if not os.path.exists(path_dll):
 # Substring to look for in process names
 target_substring = "LockDownBrowser"
 
+# check if lockdown browser is running, if it is, end the process
+for proc in psutil.process_iter(['name']):
+    proc_name = proc.name()
+    if target_substring in proc_name:
+        pid = proc.pid
+        print(f"Found {proc_name} with PID: {pid}")
+        try:
+            # Once the process is found: end the process
+            proc.kill()
+        except Exception as e:
+            print(e)
+            print("Failed to close " + proc_name)
+
 print("Waiting for a LockDown Browser process to start...")
 # Loop to wait for the process to start
 while True:
@@ -36,10 +49,7 @@ while True:
                 break
             except Exception as e:
                 print(e)
-                print("DLL injection failed. Retrying in 1 second...")
-                time.sleep(1)
-            if break_flag:
-                break
+                print("DLL injection failed. Retrying...")
     if break_flag:
         break
 

@@ -13,18 +13,11 @@
 #include <wincodec.h> // For WIC
 #pragma comment(lib, "windowscodecs.lib") // Link against the WIC library
 
-#define ADDR_CLDBDOSOMESTUFF 0x100010A0
-#define ADDR_CLDBDOSOMEOTHERSTUFF 0x10001000
-#define ADDR_CLDBDOYETMORESTUFF 0x100011F0
-
 bool isFocusInstalled = false; // Global flag
 
 // create global hWND variable
-
 HWND focusHWND = NULL;
-
 HWND bringWindowToTopHWND = NULL;
-
 HWND setWindowFocusHWND = NULL;
 HWND setWindowFocushWndInsertAfter = NULL;
 int setWindowFocusX = 0;
@@ -33,24 +26,14 @@ int setWindowFocuscx = 0;
 int setWindowFocuscy = 0;
 UINT setWindowFocusuFlags = 0;
 
-
-
 BYTE originalBytesForGetForeground[5] = { 0 };
 BYTE originalBytesForShowWindow[5] = { 0 };
 BYTE originalBytesForSetWindowPos[5] = { 0 };
 BYTE orginalBytesForSetFocus[5] = { 0 };
-BYTE originalBytesForOpenProcess[5] = { 0 };
-BYTE originalBytesForTerminateProcess[5] = { 0 };
-BYTE originalBytesForExitProcess[5] = { 0 };
 BYTE originalBytesForEmptyClipboard[5] = { 0 };
 BYTE originalBytesForSetClipboardData[5] = { 0 };
-BYTE originalBytesForCreateFileA[5] = { 0 };
-BYTE originalBytesForDoSomeStuff[5] = { 0 };
-BYTE originalBytesForDoSomeOtherStuff[5] = { 0 };
-BYTE originalBytesForDoYetMoreStuff[5] = { 0 };
-
-HANDLE(WINAPI* originalCreateFileA)(LPCSTR, DWORD, DWORD, LPSECURITY_ATTRIBUTES, DWORD, DWORD, HANDLE) = nullptr;
-
+BYTE originalBytesForTerminateProcess[5] = { 0 };
+BYTE originalBytesForExitProcess[5] = { 0 };
 
 // My custom functions
 HWND WINAPI MyGetForegroundWindow();
@@ -58,55 +41,13 @@ BOOL WINAPI MyShowWindow(HWND hWnd);
 BOOL WINAPI MySetWindowPos(HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags);
 HWND WINAPI MySetFocus(HWND hWnd);
 HWND WINAPI MyGetWindow(HWND hWnd, UINT uCmd);
-BOOL WINAPI MyEnumWindows(WNDENUMPROC lpEnumFunc, LPARAM lParam);
 int WINAPI MyGetWindowTextW(HWND hWnd, LPWSTR lpString, int nMaxCount);
-BOOL WINAPI MyK32EnumProcesses(DWORD* pProcessIds, DWORD cb, DWORD* pBytesReturned);
+BOOL WINAPI MyK32EnumProcesses(DWORD * pProcessIds, DWORD cb, DWORD * pBytesReturned);
 HANDLE WINAPI MyOpenProcess(DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD dwProcessId);
 BOOL WINAPI MyTerminateProcess(HANDLE hProcess, UINT uExitCode);
 VOID WINAPI MyExitProcess(UINT uExitCode);
 BOOL WINAPI MyEmptyClipboard();
 HANDLE WINAPI MySetClipboardData(UINT uFormat, HANDLE hMem);
-HANDLE WINAPI MyCreateFileA(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
-    LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition,
-    DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
-
-
-extern "C" int MyCLDBDoSomeStuff(int* a1) {
-    if (*a1 >> 6 & 1) {
-        // todo check if this actually matters
-        auto v1 = 1024;
-        v1 += 2048;
-        auto v6 = v1 + 2048;
-        *a1 += 2 * v6;
-
-        return v6;
-    }
-
-    return 0;
-}
-
-extern "C" bool MyCLDBDoSomeOtherStuff(int* a1) {
-    // todo check if this actually matters
-    *a1 += 2048;
-
-    return TRUE; // In C++, true is the equivalent of TRUE in C.
-}
-
-extern "C" bool MyCLDBDoYetMoreStuff() {
-    return TRUE; // true in C++.
-}
-
-HANDLE WINAPI MyCreateFileA(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
-    LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition,
-    DWORD dwFlagsAndAttributes, HANDLE hTemplateFile) {
-    if (dwShareMode == 0) {
-        dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
-        std::cout << "Intercepted CreateFileA: Modified dwShareMode to allow read, write, delete sharing." << std::endl;
-    }
-
-    // Call the original CreateFileA function using the saved function pointer
-    return originalCreateFileA(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
-}
 
 // Implement MySetClipboardData which does nothing
 HANDLE WINAPI MySetClipboardData(UINT uFormat, HANDLE hMem) {
@@ -128,18 +69,14 @@ HANDLE WINAPI MyOpenProcess(DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD dw
 
 BOOL WINAPI MyTerminateProcess(HANDLE hProcess, UINT uExitCode) {
     std::cout << "TerminateProcess hook called, but not terminating process." << std::endl;
-    //   if (hProcess == OpenProcess(PROCESS_TERMINATE, FALSE, findDiscordProcessId())) {
-       //	std::cout << "Discord process found, but not terminating process." << std::endl;
-       //	return TRUE; // Simulate success
-       //}
-    return FALSE;
+    return TRUE; // Simulate success
 }
 
 VOID WINAPI MyExitProcess(UINT uExitCode) {
     std::cout << "ExitProcess hook called, but not exiting process." << std::endl;
 }
 
-BOOL WINAPI MyK32EnumProcesses(DWORD* pProcessIds, DWORD cb, DWORD* pBytesReturned) {
+BOOL WINAPI MyK32EnumProcesses(DWORD * pProcessIds, DWORD cb, DWORD * pBytesReturned) {
     // This custom function behaves as if no processes are running
     std::cout << "K32EnumProcesses hook called, but pretending no processes exist." << std::endl;
     if (pBytesReturned != NULL) {
@@ -183,93 +120,67 @@ HWND WINAPI MyGetWindow(HWND hWnd, UINT uCmd) {
     return NULL; // Indicate no window found
 }
 
-BOOL WINAPI MyEnumWindows(WNDENUMPROC lpEnumFunc, LPARAM lParam) {
-    // This custom function behaves as if no windows are open
-    std::cout << "EnumWindows hook called, but pretending no windows exist." << std::endl;
-    return TRUE; // Indicate success but don't actually call the callback
-}
-
-void InstallDllHook(void* targetFunction, void* myFunction, BYTE* originalBytes) {
-    DWORD oldProtect;
-    // Attempt to change the memory protection to modify the target function
-    if (VirtualProtect(targetFunction, 5, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-        memcpy(originalBytes, targetFunction, 5); // Backup original bytes
-
-        DWORD offset = (DWORD)myFunction - (DWORD)targetFunction - 5;
-        *((BYTE*)targetFunction) = 0xE9; // JMP instruction
-        *((DWORD*)((BYTE*)targetFunction + 1)) = offset;
-
-        // Restore the original memory protection
-        VirtualProtect(targetFunction, 5, oldProtect, &oldProtect);
-    }
-    else {
-        std::cerr << "Failed to change memory protection for hook installation." << std::endl;
-    }
-}
-
-
 void InstallHook() {
     std::cout << "Installing hooks..." << std::endl;
     DWORD oldProtect;
 
-    /*InstallDllHook((void*)ADDR_CLDBDOSOMESTUFF, MyCLDBDoSomeStuff, originalBytesForDoSomeStuff);
-    InstallDllHook((void*)ADDR_CLDBDOSOMEOTHERSTUFF, MyCLDBDoSomeOtherStuff, originalBytesForDoSomeOtherStuff);
-    InstallDllHook((void*)ADDR_CLDBDOYETMORESTUFF, MyCLDBDoYetMoreStuff, originalBytesForDoYetMoreStuff);*/
-
-    //// Hook CreateFileA
-    //void* targetCreateFileA = CreateFileA;
-    //DWORD jumpCreateFileA = (DWORD)MyCreateFileA - (DWORD)targetCreateFileA - 5;
-    //memcpy(originalBytesForCreateFileA, targetCreateFileA, sizeof(originalBytesForCreateFileA));
-    //VirtualProtect(targetCreateFileA, sizeof(originalBytesForCreateFileA), PAGE_EXECUTE_READWRITE, &oldProtect);
-    //*((BYTE*)targetCreateFileA) = 0xE9;
-    //*((DWORD*)((BYTE*)targetCreateFileA + 1)) = jumpCreateFileA;
-    //VirtualProtect(targetCreateFileA, sizeof(originalBytesForCreateFileA), oldProtect, &oldProtect);
-
-
-    //// Hook SetClipboardData
-    //void* targetSetClipboardData = SetClipboardData;
-    //DWORD jumpSetClipboardData = (DWORD)MySetClipboardData - (DWORD)targetSetClipboardData - 5;
-    //memcpy(originalBytesForSetClipboardData, targetSetClipboardData, sizeof(originalBytesForSetClipboardData));
-    //VirtualProtect(targetSetClipboardData, sizeof(originalBytesForSetClipboardData), PAGE_EXECUTE_READWRITE, &oldProtect);
-    //*((BYTE*)targetSetClipboardData) = 0xE9;
-    //*((DWORD*)((BYTE*)targetSetClipboardData + 1)) = jumpSetClipboardData;
-    //VirtualProtect(targetSetClipboardData, sizeof(originalBytesForSetClipboardData), oldProtect, &oldProtect);
-
     // Hook EmptyClipboard
-    void* targetEmptyClipboard = EmptyClipboard;
-    DWORD jumpEmptyClipboard = (DWORD)MyEmptyClipboard - (DWORD)targetEmptyClipboard - 5;
-    memcpy(originalBytesForEmptyClipboard, targetEmptyClipboard, sizeof(originalBytesForEmptyClipboard));
-    VirtualProtect(targetEmptyClipboard, sizeof(originalBytesForEmptyClipboard), PAGE_EXECUTE_READWRITE, &oldProtect);
-    *((BYTE*)targetEmptyClipboard) = 0xE9;
-    *((DWORD*)((BYTE*)targetEmptyClipboard + 1)) = jumpEmptyClipboard;
-    VirtualProtect(targetEmptyClipboard, sizeof(originalBytesForEmptyClipboard), oldProtect, &oldProtect);
+    HMODULE hUser32 = GetModuleHandle(L"user32.dll");
+    if (hUser32) {
+        void* targetEmptyClipboard = GetProcAddress(hUser32, "EmptyClipboard");
+        if (targetEmptyClipboard) {
+            DWORD jumpEmptyClipboard = (DWORD)MyEmptyClipboard - (DWORD)targetEmptyClipboard - 5;
+            memcpy(originalBytesForEmptyClipboard, targetEmptyClipboard, sizeof(originalBytesForEmptyClipboard));
+            if (VirtualProtect(targetEmptyClipboard, sizeof(originalBytesForEmptyClipboard), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+                *((BYTE*)targetEmptyClipboard) = 0xE9;
+                *((DWORD*)((BYTE*)targetEmptyClipboard + 1)) = jumpEmptyClipboard;
+                VirtualProtect(targetEmptyClipboard, sizeof(originalBytesForEmptyClipboard), oldProtect, &oldProtect);
+            }
+        }
+    }
 
     // Hook GetForegroundWindow
-    void* targetGetForegroundWindow = GetForegroundWindow;
-    DWORD jumpGetForeground = (DWORD)MyGetForegroundWindow - (DWORD)targetGetForegroundWindow - 5;
-    memcpy(originalBytesForGetForeground, targetGetForegroundWindow, sizeof(originalBytesForGetForeground));
-    VirtualProtect(targetGetForegroundWindow, sizeof(originalBytesForGetForeground), PAGE_EXECUTE_READWRITE, &oldProtect);
-    *((BYTE*)targetGetForegroundWindow) = 0xE9;
-    *((DWORD*)((BYTE*)targetGetForegroundWindow + 1)) = jumpGetForeground;
-    VirtualProtect(targetGetForegroundWindow, sizeof(originalBytesForGetForeground), oldProtect, &oldProtect);
+    if (hUser32) {
+        void* targetGetForegroundWindow = GetProcAddress(hUser32, "GetForegroundWindow");
+        if (targetGetForegroundWindow) {
+            DWORD jumpGetForeground = (DWORD)MyGetForegroundWindow - (DWORD)targetGetForegroundWindow - 5;
+            memcpy(originalBytesForGetForeground, targetGetForegroundWindow, sizeof(originalBytesForGetForeground));
+            if (VirtualProtect(targetGetForegroundWindow, sizeof(originalBytesForGetForeground), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+                *((BYTE*)targetGetForegroundWindow) = 0xE9;
+                *((DWORD*)((BYTE*)targetGetForegroundWindow + 1)) = jumpGetForeground;
+                VirtualProtect(targetGetForegroundWindow, sizeof(originalBytesForGetForeground), oldProtect, &oldProtect);
+            }
+        }
+    }
 
     // Hook TerminateProcess
-    void* targetTerminateProcess = TerminateProcess;
-    DWORD jumpTerminateProcess = ((DWORD)MyTerminateProcess - (DWORD)targetTerminateProcess - 5);
-    memcpy(originalBytesForTerminateProcess, targetTerminateProcess, sizeof(originalBytesForTerminateProcess));
-    VirtualProtect(targetTerminateProcess, sizeof(originalBytesForTerminateProcess), PAGE_EXECUTE_READWRITE, &oldProtect);
-    *((BYTE*)targetTerminateProcess) = 0xE9;
-    *((DWORD*)((BYTE*)targetTerminateProcess + 1)) = jumpTerminateProcess;
-    VirtualProtect(targetTerminateProcess, sizeof(originalBytesForTerminateProcess), oldProtect, &oldProtect);
+    HMODULE hKernel32 = GetModuleHandle(L"kernel32.dll");
+    if (hKernel32) {
+        void* targetTerminateProcess = GetProcAddress(hKernel32, "TerminateProcess");
+        if (targetTerminateProcess) {
+            DWORD jumpTerminateProcess = ((DWORD)MyTerminateProcess - (DWORD)targetTerminateProcess - 5);
+            memcpy(originalBytesForTerminateProcess, targetTerminateProcess, sizeof(originalBytesForTerminateProcess));
+            if (VirtualProtect(targetTerminateProcess, sizeof(originalBytesForTerminateProcess), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+                *((BYTE*)targetTerminateProcess) = 0xE9;
+                *((DWORD*)((BYTE*)targetTerminateProcess + 1)) = jumpTerminateProcess;
+                VirtualProtect(targetTerminateProcess, sizeof(originalBytesForTerminateProcess), oldProtect, &oldProtect);
+            }
+        }
+    }
 
     // Hook ExitProcess
-    void* targetExitProcess = ExitProcess;
-    DWORD jumpExitProcess = ((DWORD)MyExitProcess - (DWORD)targetExitProcess - 5);
-    memcpy(originalBytesForExitProcess, targetExitProcess, sizeof(originalBytesForExitProcess));
-    VirtualProtect(targetExitProcess, sizeof(originalBytesForExitProcess), PAGE_EXECUTE_READWRITE, &oldProtect);
-    *((BYTE*)targetExitProcess) = 0xE9;
-    *((DWORD*)((BYTE*)targetExitProcess + 1)) = jumpExitProcess;
-    VirtualProtect(targetExitProcess, sizeof(originalBytesForExitProcess), oldProtect, &oldProtect);
+    if (hKernel32) {
+        void* targetExitProcess = GetProcAddress(hKernel32, "ExitProcess");
+        if (targetExitProcess) {
+            DWORD jumpExitProcess = ((DWORD)MyExitProcess - (DWORD)targetExitProcess - 5);
+            memcpy(originalBytesForExitProcess, targetExitProcess, sizeof(originalBytesForExitProcess));
+            if (VirtualProtect(targetExitProcess, sizeof(originalBytesForExitProcess), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+                *((BYTE*)targetExitProcess) = 0xE9;
+                *((DWORD*)((BYTE*)targetExitProcess + 1)) = jumpExitProcess;
+                VirtualProtect(targetExitProcess, sizeof(originalBytesForExitProcess), oldProtect, &oldProtect);
+            }
+        }
+    }
 
     // create a message box to show the dll is loaded
     MessageBox(NULL, L"Injected :)", L"UndownUnlock", MB_OK);
@@ -284,31 +195,47 @@ void InstallFocus() {
     DWORD oldProtect;
 
     // Hook BringWindowToTop
-    void* targetShowWindow = BringWindowToTop;
-    DWORD jumpBringWindowToTop = (DWORD)MyShowWindow - (DWORD)targetShowWindow - 5;
-    memcpy(originalBytesForShowWindow, targetShowWindow, sizeof(originalBytesForShowWindow));
-    VirtualProtect(targetShowWindow, sizeof(originalBytesForShowWindow), PAGE_EXECUTE_READWRITE, &oldProtect);
-    *((BYTE*)targetShowWindow) = 0xE9;
-    *((DWORD*)((BYTE*)targetShowWindow + 1)) = jumpBringWindowToTop;
-    VirtualProtect(targetShowWindow, sizeof(originalBytesForShowWindow), oldProtect, &oldProtect);
+    HMODULE hUser32 = GetModuleHandle(L"user32.dll");
+    if (hUser32) {
+        void* targetShowWindow = GetProcAddress(hUser32, "BringWindowToTop");
+        if (targetShowWindow) {
+            DWORD jumpBringWindowToTop = (DWORD)MyShowWindow - (DWORD)targetShowWindow - 5;
+            memcpy(originalBytesForShowWindow, targetShowWindow, sizeof(originalBytesForShowWindow));
+            if (VirtualProtect(targetShowWindow, sizeof(originalBytesForShowWindow), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+                *((BYTE*)targetShowWindow) = 0xE9;
+                *((DWORD*)((BYTE*)targetShowWindow + 1)) = jumpBringWindowToTop;
+                VirtualProtect(targetShowWindow, sizeof(originalBytesForShowWindow), oldProtect, &oldProtect);
+            }
+        }
+    }
 
     // Hook SetWindowPos
-    void* targetSetWindowPos = SetWindowPos;
-    DWORD jumpSetWindowPos = (DWORD)MySetWindowPos - (DWORD)targetSetWindowPos - 5;
-    memcpy(originalBytesForSetWindowPos, targetSetWindowPos, sizeof(originalBytesForSetWindowPos));
-    VirtualProtect(targetSetWindowPos, sizeof(originalBytesForSetWindowPos), PAGE_EXECUTE_READWRITE, &oldProtect);
-    *((BYTE*)targetSetWindowPos) = 0xE9;
-    *((DWORD*)((BYTE*)targetSetWindowPos + 1)) = jumpSetWindowPos;
-    VirtualProtect(targetSetWindowPos, sizeof(originalBytesForSetWindowPos), oldProtect, &oldProtect);
+    if (hUser32) {
+        void* targetSetWindowPos = GetProcAddress(hUser32, "SetWindowPos");
+        if (targetSetWindowPos) {
+            DWORD jumpSetWindowPos = (DWORD)MySetWindowPos - (DWORD)targetSetWindowPos - 5;
+            memcpy(originalBytesForSetWindowPos, targetSetWindowPos, sizeof(originalBytesForSetWindowPos));
+            if (VirtualProtect(targetSetWindowPos, sizeof(originalBytesForSetWindowPos), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+                *((BYTE*)targetSetWindowPos) = 0xE9;
+                *((DWORD*)((BYTE*)targetSetWindowPos + 1)) = jumpSetWindowPos;
+                VirtualProtect(targetSetWindowPos, sizeof(originalBytesForSetWindowPos), oldProtect, &oldProtect);
+            }
+        }
+    }
 
     // Hook SetFocus
-    void* targetSetFocus = SetFocus;
-    DWORD jumpSetFocus = (DWORD)MySetFocus - (DWORD)targetSetFocus - 5;
-    memcpy(orginalBytesForSetFocus, targetSetFocus, sizeof(orginalBytesForSetFocus));
-    VirtualProtect(targetSetFocus, sizeof(orginalBytesForSetFocus), PAGE_EXECUTE_READWRITE, &oldProtect);
-    *((BYTE*)targetSetFocus) = 0xE9;
-    *((DWORD*)((BYTE*)targetSetFocus + 1)) = jumpSetFocus;
-    VirtualProtect(targetSetFocus, sizeof(orginalBytesForSetFocus), oldProtect, &oldProtect);
+    if (hUser32) {
+        void* targetSetFocus = GetProcAddress(hUser32, "SetFocus");
+        if (targetSetFocus) {
+            DWORD jumpSetFocus = (DWORD)MySetFocus - (DWORD)targetSetFocus - 5;
+            memcpy(orginalBytesForSetFocus, targetSetFocus, sizeof(orginalBytesForSetFocus));
+            if (VirtualProtect(targetSetFocus, sizeof(orginalBytesForSetFocus), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+                *((BYTE*)targetSetFocus) = 0xE9;
+                *((DWORD*)((BYTE*)targetSetFocus + 1)) = jumpSetFocus;
+                VirtualProtect(targetSetFocus, sizeof(orginalBytesForSetFocus), oldProtect, &oldProtect);
+            }
+        }
+    }
 }
 
 void UninstallFocus() {
@@ -320,44 +247,76 @@ void UninstallFocus() {
     DWORD oldProtect;
 
     // Unhook BringWindowToTop
-    void* targetShowWindow = BringWindowToTop;
-    VirtualProtect(targetShowWindow, sizeof(originalBytesForShowWindow), PAGE_EXECUTE_READWRITE, &oldProtect);
-    memcpy(targetShowWindow, originalBytesForShowWindow, sizeof(originalBytesForShowWindow));
-    VirtualProtect(targetShowWindow, sizeof(originalBytesForShowWindow), oldProtect, &oldProtect);
+    HMODULE hUser32 = GetModuleHandle(L"user32.dll");
+    if (hUser32) {
+        void* targetShowWindow = GetProcAddress(hUser32, "BringWindowToTop");
+        if (targetShowWindow) {
+            if (VirtualProtect(targetShowWindow, sizeof(originalBytesForShowWindow), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+                memcpy(targetShowWindow, originalBytesForShowWindow, sizeof(originalBytesForShowWindow));
+                VirtualProtect(targetShowWindow, sizeof(originalBytesForShowWindow), oldProtect, &oldProtect);
+            }
+        }
+    }
 
     // Unhook SetWindowPos
-    void* targetSetWindowPos = SetWindowPos;
-    VirtualProtect(targetSetWindowPos, sizeof(originalBytesForSetWindowPos), PAGE_EXECUTE_READWRITE, &oldProtect);
-    memcpy(targetSetWindowPos, originalBytesForSetWindowPos, sizeof(originalBytesForSetWindowPos));
-    VirtualProtect(targetSetWindowPos, sizeof(originalBytesForSetWindowPos), oldProtect, &oldProtect);
+    if (hUser32) {
+        void* targetSetWindowPos = GetProcAddress(hUser32, "SetWindowPos");
+        if (targetSetWindowPos) {
+            if (VirtualProtect(targetSetWindowPos, sizeof(originalBytesForSetWindowPos), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+                memcpy(targetSetWindowPos, originalBytesForSetWindowPos, sizeof(originalBytesForSetWindowPos));
+                VirtualProtect(targetSetWindowPos, sizeof(originalBytesForSetWindowPos), oldProtect, &oldProtect);
+            }
+        }
+    }
 
     // Unhook SetFocus
-    void* targetSetFocus = SetFocus;
-    VirtualProtect(targetSetFocus, sizeof(orginalBytesForSetFocus), PAGE_EXECUTE_READWRITE, &oldProtect);
-    memcpy(targetSetFocus, orginalBytesForSetFocus, sizeof(orginalBytesForSetFocus));
-    VirtualProtect(targetSetFocus, sizeof(orginalBytesForSetFocus), oldProtect, &oldProtect);
+    if (hUser32) {
+        void* targetSetFocus = GetProcAddress(hUser32, "SetFocus");
+        if (targetSetFocus) {
+            if (VirtualProtect(targetSetFocus, sizeof(orginalBytesForSetFocus), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+                memcpy(targetSetFocus, orginalBytesForSetFocus, sizeof(orginalBytesForSetFocus));
+                VirtualProtect(targetSetFocus, sizeof(orginalBytesForSetFocus), oldProtect, &oldProtect);
+            }
+        }
+    }
 }
 
 void UninstallHook() {
     DWORD oldProtect;
 
     // Unhook SetClipboardData
-    void* targetSetClipboardData = SetClipboardData;
-    VirtualProtect(targetSetClipboardData, sizeof(originalBytesForSetClipboardData), PAGE_EXECUTE_READWRITE, &oldProtect);
-    memcpy(targetSetClipboardData, originalBytesForSetClipboardData, sizeof(originalBytesForSetClipboardData));
-    VirtualProtect(targetSetClipboardData, sizeof(originalBytesForSetClipboardData), oldProtect, &oldProtect);
+    HMODULE hUser32 = GetModuleHandle(L"user32.dll");
+    if (hUser32) {
+        void* targetSetClipboardData = GetProcAddress(hUser32, "SetClipboardData");
+        if (targetSetClipboardData) {
+            if (VirtualProtect(targetSetClipboardData, sizeof(originalBytesForSetClipboardData), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+                memcpy(targetSetClipboardData, originalBytesForSetClipboardData, sizeof(originalBytesForSetClipboardData));
+                VirtualProtect(targetSetClipboardData, sizeof(originalBytesForSetClipboardData), oldProtect, &oldProtect);
+            }
+        }
+    }
 
     // Unhook EmptyClipboard
-    void* targetEmptyClipboard = EmptyClipboard;
-    VirtualProtect(targetEmptyClipboard, sizeof(originalBytesForEmptyClipboard), PAGE_EXECUTE_READWRITE, &oldProtect);
-    memcpy(targetEmptyClipboard, originalBytesForEmptyClipboard, sizeof(originalBytesForEmptyClipboard));
-    VirtualProtect(targetEmptyClipboard, sizeof(originalBytesForEmptyClipboard), oldProtect, &oldProtect);
+    if (hUser32) {
+        void* targetEmptyClipboard = GetProcAddress(hUser32, "EmptyClipboard");
+        if (targetEmptyClipboard) {
+            if (VirtualProtect(targetEmptyClipboard, sizeof(originalBytesForEmptyClipboard), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+                memcpy(targetEmptyClipboard, originalBytesForEmptyClipboard, sizeof(originalBytesForEmptyClipboard));
+                VirtualProtect(targetEmptyClipboard, sizeof(originalBytesForEmptyClipboard), oldProtect, &oldProtect);
+            }
+        }
+    }
 
     // Unhook GetForegroundWindow
-    void* targetGetForegroundWindow = GetForegroundWindow;
-    VirtualProtect(targetGetForegroundWindow, sizeof(originalBytesForGetForeground), PAGE_EXECUTE_READWRITE, &oldProtect);
-    memcpy(targetGetForegroundWindow, originalBytesForGetForeground, sizeof(originalBytesForGetForeground));
-    VirtualProtect(targetGetForegroundWindow, sizeof(originalBytesForGetForeground), oldProtect, &oldProtect);
+    if (hUser32) {
+        void* targetGetForegroundWindow = GetProcAddress(hUser32, "GetForegroundWindow");
+        if (targetGetForegroundWindow) {
+            if (VirtualProtect(targetGetForegroundWindow, sizeof(originalBytesForGetForeground), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+                memcpy(targetGetForegroundWindow, originalBytesForGetForeground, sizeof(originalBytesForGetForeground));
+                VirtualProtect(targetGetForegroundWindow, sizeof(originalBytesForGetForeground), oldProtect, &oldProtect);
+            }
+        }
+    }
 }
 
 // Helper function to determine if the given window is the main window of the current process
@@ -382,74 +341,6 @@ HWND FindMainWindow() {
     HWND mainWindow = NULL;
     EnumWindows(EnumWindowsCallback, reinterpret_cast<LPARAM>(&mainWindow));
     return mainWindow;
-}
-
-
-// Helper function to determine if the given window has the title "Respondus LockDown Browser"
-BOOL IsTargetWindowWithTitle(HWND handle, LPCSTR targetTitle) {
-    const int bufferSize = 256;
-    wchar_t title[bufferSize];
-    if (GetWindowText(handle, title, bufferSize) > 0) {
-        // Check if the window's title is the one we're looking for
-        if (wcscmp(title, L"Respondus LockDown Browser") == 0) {
-            return TRUE;
-        }
-    }
-    return FALSE;
-}
-
-// Callback function for EnumWindows
-BOOL CALLBACK TargetEnumWindowsCallback(HWND handle, LPARAM lParam) {
-    DWORD processID = 0;
-    GetWindowThreadProcessId(handle, &processID);
-    // Use a specific window title instead of checking if it's the main window
-    LPCSTR targetTitle = "LockDown Browser";
-    if (IsTargetWindowWithTitle(handle, targetTitle)) {
-        // Stop enumeration if the target window is found, and return its handle
-        *reinterpret_cast<HWND*>(lParam) = handle;
-        return FALSE; // return FALSE to stop enumeration
-    }
-    return TRUE; // return TRUE to continue enumeration
-}
-
-// Function to find the window with title "Respondus LockDown Browser"
-HWND FindTargetWindow() {
-    HWND targetWindow = NULL;
-    EnumWindows(TargetEnumWindowsCallback, reinterpret_cast<LPARAM>(&targetWindow));
-    return targetWindow;
-}
-
-// Define a structure to hold window information
-struct WindowInfo {
-    std::wstring title;
-};
-
-// Callback function to enumerate windows
-BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
-    const int bufferSize = 256;
-    wchar_t title[bufferSize];
-    std::vector<WindowInfo>* windows = reinterpret_cast<std::vector<WindowInfo>*>(lParam);
-
-    if (GetWindowText(hwnd, title, bufferSize) > 0 && IsWindowVisible(hwnd)) {
-        // Add window title to the vector if it has a title and is visible
-        windows->push_back(WindowInfo{ title });
-    }
-    return TRUE; // Continue enumeration
-}
-
-// Function to write window titles to a file
-void WriteWindowTitlesToFile(const std::vector<WindowInfo>& windows, const std::wstring& filePath) {
-    std::wofstream file(filePath);
-    if (file.is_open()) {
-        for (const auto& window : windows) {
-            file << window.title << std::endl;
-        }
-        file.close();
-    }
-    else {
-        // Handle file open error
-        MessageBoxW(NULL, L"Unable to open file for writing.", L"Error", MB_ICONERROR);
-    }
 }
 
 // Your hook function implementation
@@ -527,8 +418,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     case DLL_PROCESS_ATTACH:
         DisableThreadLibraryCalls(hModule);
         // Start the hook setup in a new thread to keep DllMain non-blocking
-
-        InstallHook(); // Sets up your custom 
+        InstallHook(); // Sets up your custom hooks
         std::thread([]() {
             SetupKeyboardHook(); // Sets up the keyboard hook
             }).detach();
