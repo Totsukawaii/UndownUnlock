@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <windows.h>
+#include "mem.h"
 #include <psapi.h>
 #include <iostream>
 #include <tlhelp32.h>
@@ -34,6 +35,17 @@ BYTE originalBytesForEmptyClipboard[5] = { 0 };
 BYTE originalBytesForSetClipboardData[5] = { 0 };
 BYTE originalBytesForTerminateProcess[5] = { 0 };
 BYTE originalBytesForExitProcess[5] = { 0 };
+
+
+typedef BOOL(WINAPI* tTerminateProcess)(HANDLE hProcess, UINT uExitCode);
+tTerminateProcess ogTerminateProcess;
+typedef BOOL(WINAPI* tEmptyClipboard)();
+tEmptyClipboard ogEmptyClipboard;
+typedef HANDLE(WINAPI* tSetClipboardData)(UINT uFormat, HANDLE hMem);
+tSetClipboardData ogSetClipboardData;
+typedef BOOL(WINAPI* tGetForegroundWindow)();
+tGetForegroundWindow ogGetForegroundWindow;
+
 
 // My custom functions
 HWND WINAPI MyGetForegroundWindow();
@@ -125,62 +137,18 @@ void InstallHook() {
     DWORD oldProtect;
 
     // Hook EmptyClipboard
-    HMODULE hUser32 = GetModuleHandle(L"user32.dll");
-    if (hUser32) {
-        void* targetEmptyClipboard = GetProcAddress(hUser32, "EmptyClipboard");
-        if (targetEmptyClipboard) {
-            DWORD jumpEmptyClipboard = (DWORD)MyEmptyClipboard - (DWORD)targetEmptyClipboard - 5;
-            memcpy(originalBytesForEmptyClipboard, targetEmptyClipboard, sizeof(originalBytesForEmptyClipboard));
-            if (VirtualProtect(targetEmptyClipboard, sizeof(originalBytesForEmptyClipboard), PAGE_EXECUTE_READWRITE, &oldProtect)) {
-                *((BYTE*)targetEmptyClipboard) = 0xE9;
-                *((DWORD*)((BYTE*)targetEmptyClipboard + 1)) = jumpEmptyClipboard;
-                VirtualProtect(targetEmptyClipboard, sizeof(originalBytesForEmptyClipboard), oldProtect, &oldProtect);
-            }
-        }
-    }
+    ogEmptyClipboard = (tEmptyClipboard)GetProcAddress(GetModuleHandle(L"User32.dll"), "EmptyClipboard");
+    ogEmptyClipboard = (tEmptyClipboard)mem::TrampHook32((BYTE*)ogEmptyClipboard, (BYTE*)MyEmptyClipboard, 5);
 
     // Hook GetForegroundWindow
-    if (hUser32) {
-        void* targetGetForegroundWindow = GetProcAddress(hUser32, "GetForegroundWindow");
-        if (targetGetForegroundWindow) {
-            DWORD jumpGetForeground = (DWORD)MyGetForegroundWindow - (DWORD)targetGetForegroundWindow - 5;
-            memcpy(originalBytesForGetForeground, targetGetForegroundWindow, sizeof(originalBytesForGetForeground));
-            if (VirtualProtect(targetGetForegroundWindow, sizeof(originalBytesForGetForeground), PAGE_EXECUTE_READWRITE, &oldProtect)) {
-                *((BYTE*)targetGetForegroundWindow) = 0xE9;
-                *((DWORD*)((BYTE*)targetGetForegroundWindow + 1)) = jumpGetForeground;
-                VirtualProtect(targetGetForegroundWindow, sizeof(originalBytesForGetForeground), oldProtect, &oldProtect);
-            }
-        }
-    }
+    ogGetForegroundWindow = (tGetForegroundWindow)GetProcAddress(GetModuleHandle(L"User32.dll"), "GetForegroundWindow");
+    ogGetForegroundWindow = (tGetForegroundWindow)mem::TrampHook32((BYTE*)ogGetForegroundWindow, (BYTE*)MyGetForegroundWindow, 5);
 
     // Hook TerminateProcess
-    HMODULE hKernel32 = GetModuleHandle(L"kernel32.dll");
-    if (hKernel32) {
-        void* targetTerminateProcess = GetProcAddress(hKernel32, "TerminateProcess");
-        if (targetTerminateProcess) {
-            DWORD jumpTerminateProcess = ((DWORD)MyTerminateProcess - (DWORD)targetTerminateProcess - 5);
-            memcpy(originalBytesForTerminateProcess, targetTerminateProcess, sizeof(originalBytesForTerminateProcess));
-            if (VirtualProtect(targetTerminateProcess, sizeof(originalBytesForTerminateProcess), PAGE_EXECUTE_READWRITE, &oldProtect)) {
-                *((BYTE*)targetTerminateProcess) = 0xE9;
-                *((DWORD*)((BYTE*)targetTerminateProcess + 1)) = jumpTerminateProcess;
-                VirtualProtect(targetTerminateProcess, sizeof(originalBytesForTerminateProcess), oldProtect, &oldProtect);
-            }
-        }
-    }
-
+    ogTerminateProcess = (tTerminateProcess)GetProcAddress(GetModuleHandle(L"Kernel32.dll"), "TerminateProcess");
+    ogTerminateProcess = (tTerminateProcess)mem::TrampHook32((BYTE*)ogTerminateProcess, (BYTE*)MyTerminateProcess, 5);
+    
     // Hook ExitProcess
-    if (hKernel32) {
-        void* targetExitProcess = GetProcAddress(hKernel32, "ExitProcess");
-        if (targetExitProcess) {
-            DWORD jumpExitProcess = ((DWORD)MyExitProcess - (DWORD)targetExitProcess - 5);
-            memcpy(originalBytesForExitProcess, targetExitProcess, sizeof(originalBytesForExitProcess));
-            if (VirtualProtect(targetExitProcess, sizeof(originalBytesForExitProcess), PAGE_EXECUTE_READWRITE, &oldProtect)) {
-                *((BYTE*)targetExitProcess) = 0xE9;
-                *((DWORD*)((BYTE*)targetExitProcess + 1)) = jumpExitProcess;
-                VirtualProtect(targetExitProcess, sizeof(originalBytesForExitProcess), oldProtect, &oldProtect);
-            }
-        }
-    }
 
     // create a message box to show the dll is loaded
     MessageBox(NULL, L"Injected :)", L"UndownUnlock", MB_OK);
